@@ -1,9 +1,11 @@
 {
 	"required": true,
-	"package": "com.example.mixin.client",
+	"package": "allclients2.lightweight.mixins",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ExampleClientMixin"
+		"ClientUIMixin",
+		"ClientTickMixin",
+		"EntryMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
