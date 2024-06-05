@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
 	"id": "lightweight",
-	"version": "0.1.0",
+	"version": "0.1.4",
 	"name": "Lightweight",
-	"description": "Lightweight info screen by pressing F4",
+	"description": "Lightweight info screen by pressing F4; micro F3 menu.",
 	"authors": [
 		"allclients2"
 	],

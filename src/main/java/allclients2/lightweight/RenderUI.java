@@ -7,6 +7,7 @@ import allclients2.lightweight.input.InputListener;
 import allclients2.lightweight.measure.TickRateMeasurer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
@@ -25,16 +26,18 @@ public class RenderUI {
         EventBus.subscribe(InputEvent.class, evt -> {
             if (evt.keyCode == GLFW.GLFW_KEY_F4) {
                 isRenderActivated = !isRenderActivated;
+                TickRateMeasurer.toggleUse(isRenderActivated);
             }
         });
     }
 
     private static void renderStep(MatrixStack matrixStack) {
-        if (LightWeightClient.player != null) { // Only render is player is present.
+        final ClientPlayerEntity player = LightWeightClient.getPlayer();
+        if (player != null) { // Only render is player is present.
             textDrawer.update(matrixStack);
-            textDrawer.drawShadedText("FPS: " + MinecraftClient.getInstance().getCurrentFps(), 20, 10, new Color(166,166,166).getRGB());
-            textDrawer.drawShadedText("CTPS: " + formatNum(TickRateMeasurer.getAverageTickRate()), 20, 20, new Color(166,166,166).getRGB());
-            textDrawer.drawShadedText("POS: " + formatPos(LightWeightClient.player.getPos()), 20, 20, new Color(166,166,166).getRGB());
+            textDrawer.drawShadedText("FPS: " + MinecraftClient.getInstance().getCurrentFps(), 13, 7, new Color(166,166,166).getRGB());
+            textDrawer.drawShadedText("CTPS: " + formatNum(TickRateMeasurer.getAverageTickRate()), 13, 17, new Color(166,166,166).getRGB());
+            textDrawer.drawShadedText("POS: " + formatPos(player.getPos()), 13, 27, new Color(166,166,166).getRGB());
         }
     }
 

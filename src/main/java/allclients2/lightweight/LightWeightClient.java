@@ -9,8 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 
 public class LightWeightClient implements ClientModInitializer {
-
-	public static final ClientPlayerEntity player = MinecraftClient.getInstance().player;
 	private static LightWeightClient INSTANCE;
 
 	// Instances
@@ -33,5 +31,9 @@ public class LightWeightClient implements ClientModInitializer {
 		renderUI = new RenderUI();
 		tickRateMeasurer = new TickRateMeasurer();
 		inputListener = new InputListener();
+	}
+
+	public static ClientPlayerEntity getPlayer() {
+		return MinecraftClient.getInstance().player;
 	}
 }

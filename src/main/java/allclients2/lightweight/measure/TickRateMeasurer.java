@@ -1,19 +1,30 @@
 package allclients2.lightweight.measure;
 
 import allclients2.lightweight.eventbus.EventBus;
+import allclients2.lightweight.eventbus.Subscription;
 import allclients2.lightweight.eventbus.events.ClientTickEvent;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class TickRateMeasurer {
+    private static final boolean shouldSampleOnlyWhenUsing = true;
+
+    private static boolean sampling = true;
     private static float lastTickDelta = 0;
     private static long lastTickTimeNS = System.nanoTime();
     private static final Queue<Long> tickTimeQueue = new LinkedList<>();
+    private static Subscription<ClientTickEvent> clientTickSubscription;
     private static final long SAMPLE_NS = 5L * 1_000_000_000L;
 
     public TickRateMeasurer() {
-        startMeasure();
+        this(true);
+    }
+
+    public TickRateMeasurer(boolean shouldSample) {
+        if (shouldSample) {
+            startSampling();
+        }
     }
 
     public static float getLastTickRate() {
@@ -39,16 +50,37 @@ public class TickRateMeasurer {
         return 1.0f / average;
     }
 
-    private static void startMeasure() {
-        EventBus.subscribe(ClientTickEvent.class, evt -> {
-            final long currentTime = System.nanoTime();
-            lastTickDelta = ((float) (currentTime - lastTickTimeNS)) * 1e-9f;
-            lastTickTimeNS = currentTime;
+    private static void startSampling() {
+        if (clientTickSubscription == null) {
+            tickTimeQueue.clear();
+            lastTickTimeNS = System.nanoTime();
+            clientTickSubscription = EventBus.subscribe(ClientTickEvent.class, evt -> {
+                final long currentTime = System.nanoTime();
+                lastTickDelta = ((float) (currentTime - lastTickTimeNS)) * 1e-9f;
+                lastTickTimeNS = currentTime;
 
-            tickTimeQueue.add(currentTime);
+                tickTimeQueue.add(currentTime);
+                removeOldTicks();
+            });
+        }
+    }
 
-            removeOldTicks();
-        });
+    private static void stopSampling() {
+        if (clientTickSubscription != null) {
+            EventBus.unsubscribe(clientTickSubscription);
+            clientTickSubscription = null;
+        }
+    }
+
+    public static void toggleUse(boolean isUsing) {
+        if (shouldSampleOnlyWhenUsing) {
+            if (isUsing && !sampling) {
+                startSampling();
+            } else if (sampling) {
+                stopSampling();
+            }
+            sampling = isUsing;
+        }
     }
 
     private static void removeOldTicks() {
